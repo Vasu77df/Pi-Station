@@ -1,8 +1,9 @@
 # Pi-Station
-Repository for all the projects I implement on my Home Pi
+Repository for all the projects I implement on my Home Pi more stuff coming in the future.
 
-### The cron job that is set right now
----
+-  setting a cron job that runs every 10th min to fetch weather and time data as it is constant 
+    refreshing of the E-Ink display can lead to failures 
+
 ```console
 */10**** /bin/bash /home/orwell/weather_runner.sh
 ```
