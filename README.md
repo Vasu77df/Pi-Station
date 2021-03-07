@@ -12,3 +12,8 @@ Repository for all the projects I implement on my Home Pi more stuff coming in t
 ```console
     orwell ALL = NO PASSWD: /bin/python3
 ```
+
+- Also you have to move the meteocon.ttf icons file to this directory to run the script as cron job
+```console
+    /usr/share/fonts/truetype/meteocon/meteocons.ttf
+```
