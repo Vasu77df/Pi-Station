@@ -1,0 +1,1 @@
+sudo /bin/python3 /home/orwell/EInk_Bonnet_Weather_Station/weather.py

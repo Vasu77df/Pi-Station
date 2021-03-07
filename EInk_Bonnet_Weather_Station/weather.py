@@ -20,7 +20,7 @@ busy = digitalio.DigitalInOut(board.D17)
 
 # You'll need to get a token from openweathermap.org, looks like:
 # 'b6907d289e10d714a6e88b30761fae22'
-OPEN_WEATHER_TOKEN = "db42a24208e287f983d4e70ddf1cd4cb"
+OPEN_WEATHER_TOKEN = ""
 
 # Use cityname, country code where countrycode is ISO3166 format.
 # E.g. "New York, US" or "London, GB"
@@ -46,17 +46,17 @@ display.rotation = 1
 gfx = Weather_Graphics(display, am_pm=True, celsius=True)
 weather_refresh = None
 
-while True:
+#while True:
     # only query the weather every 10 minutes (and on first run)
-    if (not weather_refresh) or (time.monotonic() - weather_refresh) > 600:
-        response = urllib.request.urlopen(data_source)
-        if response.getcode() == 200:
-            value = response.read()
-            print("Response is", value)
-            gfx.display_weather(value)
-            weather_refresh = time.monotonic()
-        else:
-            print("Unable to retrieve data at {}".format(url))
+#    if not weather_refresh or (time.monotonic() - weather_refresh) > 600:
+response = urllib.request.urlopen(data_source)
+if response.getcode() == 200:
+    value = response.read()
+    print("Response is", value)
+    gfx.display_weather(value)
+    weather_refresh = time.monotonic()
+else:
+    print("Unable to retrieve data at {}".format(url))
 
-    gfx.update_time()
-    time.sleep(300)  # wait 5 minutes before updating anything again
+gfx.update_time()
+#time.sleep(300)  # wait 5 minutes before updating anything again
