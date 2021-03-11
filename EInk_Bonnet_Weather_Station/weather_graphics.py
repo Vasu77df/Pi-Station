@@ -6,11 +6,11 @@ from adafruit_epd.epd import Adafruit_EPD
 small_font = ImageFont.truetype(
     "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 16
 )
-medium_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 20)
+medium_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 18)
 large_font = ImageFont.truetype(
     "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 44
 )
-icon_font = ImageFont.truetype("/usr/share/fonts/truetype/meteocon/meteocons.ttf", 48)
+icon_font = ImageFont.truetype("/usr/share/fonts/truetype/meteocon/meteocons.ttf", 36)
 
 # Map the OpenWeatherMap icon code to the appropriate font character
 # See http://www.alessioatzeni.com/meteocons/ for icons
@@ -56,7 +56,10 @@ class Weather_Graphics:
         self._main_text = None
         self._temperature = None
         self._description = None
+        self._clothes = None
         self._time_text = None
+        self._feels_like = None
+        
 
     def display_weather(self, weather):
         weather = json.loads(weather.decode("utf-8"))
@@ -73,17 +76,42 @@ class Weather_Graphics:
         self._main_text = main
 
         temperature = weather["main"]["temp"] - 273.15  # its...in kelvin
+        feels_like =  weather["main"]["feels_like"] - 273.15
         print(temperature)
+        print("feels like: " + str(feels_like))
         if self.celsius:
             self._temperature = "%d °C" % temperature
+            self._feels_like = "%d °C" % feels_like
         else:
             self._temperature = "%d °F" % ((temperature * 9 / 5) + 32)
+            self._feels_like = "%d °C" % ((feels_like * 9 / 5) + 32)
 
         description = weather["weather"][0]["description"]
         description = description[0].upper() + description[1:]
         print(description)
         self._description = description
+        if temperature > 20:
+            clothes = "Shorts Weather"
+            self._clothes = clothes
+        elif temperature > 15 and temperature < 20:
+            clothes = "Hoodie day"
+            self._clothes = clothes
+        elif temperature > 10  and temperature < 15:
+            clothes = "Thick Hoodie"
+            self._clothes = clothes
+        elif temperature > 5 and temperature < 10:
+            clothes = "Jacket and hoodie"
+            self._clothes = clothes
+        elif temperature > -5  and  temperature < 5:
+            clothes = "Jacket and thick hoodie"
+            self._clothes = clothes
+        else:
+            clothes = "Heavy Jacket"
+            self._clothes = clothes
+        print(clothes)
         # "thunderstorm with heavy drizzle"
+        print("height: " + str(self.display.height))
+        print("width: " + str(self.display.width))
 
         self.update_time()
 
@@ -99,10 +127,11 @@ class Weather_Graphics:
 
         # Draw the Icon
         (font_width, font_height) = icon_font.getsize(self._weather_icon)
+        print("font width: " + str(font_width) + "font_height: " + str(font_height))
         draw.text(
             (
-                self.display.width // 2 - font_width // 2,
-                self.display.height // 2 - font_height // 2 - 5,
+                self.display.width - font_width // 2 - 40 ,
+                self.display.height - font_height // 2 - 65,
             ),
             self._weather_icon,
             font=icon_font,
@@ -111,47 +140,59 @@ class Weather_Graphics:
 
         # Draw the city
         draw.text(
-            (5, 5), self._city_name, font=self.medium_font, fill=BLACK,
+            (1, 1), self._city_name, font=self.medium_font, fill=BLACK,
         )
 
         # Draw the time
         (font_width, font_height) = medium_font.getsize(self._time_text)
+        print("time font width: " + str(font_width) + "font_height: " + str(font_height))
         draw.text(
-            (5, font_height * 2 - 5),
+            (1, font_height * 2 - 16),
             self._time_text,
             font=self.medium_font,
             fill=BLACK,
         )
 
-        # Draw the main text
-        (font_width, font_height) = medium_font.getsize(self._main_text)
+        # Draw the feels like
+        (font_width, font_height) = medium_font.getsize(self._feels_like)
+        print("feels like font width: " + str(font_width) + "font_height: " + str(font_height))
         draw.text(
-            (4, self.display.height - font_height * 3),
-            self._main_text,
+            (1, self.display.height - font_height * 5 + 10),
+            "feels like: " + self._feels_like,
             font=self.medium_font,
             fill=BLACK,
         )
 
         # Draw the description
         (font_width, font_height) = small_font.getsize(self._description)
+        print("desc font width: " + str(font_width) + "font_height: " + str(font_height))
         draw.text(
             (5, self.display.height - font_height - 7),
             self._description,
-            font=self.small_font,
+            font=self.medium_font,
             fill=BLACK,
         )
 
         # Draw the temperature
         (font_width, font_height) = large_font.getsize(self._temperature)
+        print("temp font width: " + str(font_width) + "font_height: " + str(font_height))
         draw.text(
             (
                 self.display.width - font_width - 5,
-                self.display.height - font_height * 2,
+                self.display.height - font_height * 3,
             ),
             self._temperature,
             font=self.large_font,
             fill=BLACK,
         )
 
+        (font_width, font_height) = small_font.getsize(self._clothes)
+        print("clothes font width: " + str(font_width) + "font_height: " + str(font_height))
+        draw.text(
+            (1, self.display.height - font_height - 30),
+            self._clothes,
+            font=self.medium_font,
+            fill=BLACK,
+        )
         self.display.image(image)
         self.display.display()
