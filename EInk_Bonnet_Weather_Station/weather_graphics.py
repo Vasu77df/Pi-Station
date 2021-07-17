@@ -67,7 +67,7 @@ class Weather_Graphics:
         # set the icon/background
         self._weather_icon = ICON_MAP[weather["weather"][0]["icon"]]
 
-        city_name = weather["name"] + ", " + weather["sys"]["country"]
+        city_name = weather["name"]
         print(city_name)
         self._city_name = city_name
 
