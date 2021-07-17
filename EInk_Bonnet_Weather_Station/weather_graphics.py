@@ -92,22 +92,23 @@ class Weather_Graphics:
         self._description = description
         if temperature > 20:
             clothes = "Shorts Weather"
-            self._clothes = clothes
+            
         elif temperature > 15 and temperature < 20:
             clothes = "Hoodie day"
-            self._clothes = clothes
+            
         elif temperature > 10  and temperature < 15:
             clothes = "Thick Hoodie"
-            self._clothes = clothes
+            
         elif temperature > 5 and temperature < 10:
             clothes = "Jacket and hoodie"
-            self._clothes = clothes
+            
         elif temperature > -5  and  temperature < 5:
             clothes = "Jacket and thick hoodie"
-            self._clothes = clothes
+            
         else:
             clothes = "Heavy Jacket"
-            self._clothes = clothes
+            
+        self._clothes = clothes
         print(clothes)
         # "thunderstorm with heavy drizzle"
         print("height: " + str(self.display.height))
