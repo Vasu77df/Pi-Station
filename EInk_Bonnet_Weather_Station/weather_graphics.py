@@ -59,9 +59,9 @@ class Weather_Graphics:
         self._clothes = None
         self._time_text = None
         self._feels_like = None
-        
+        self._local_temp = None
 
-    def display_weather(self, weather):
+    def display_weather(self, weather, local_temp):
         weather = json.loads(weather.decode("utf-8"))
 
         # set the icon/background
@@ -110,7 +110,8 @@ class Weather_Graphics:
             
         self._clothes = clothes
         print(clothes)
-        # "thunderstorm with heavy drizzle"
+        self._local_temp = local_temp
+        print(local_temp)
         print("height: " + str(self.display.height))
         print("width: " + str(self.display.width))
 
@@ -174,6 +175,16 @@ class Weather_Graphics:
             fill=BLACK,
         )
 
+        # Draw the Local Temperature
+        (font_width, font_height) = small_font.getsize(self._local_temp)
+        print("desc font width: " + str(font_width) + "font_height: " + str(font_height))
+        draw.text(
+            (20, self.display.height - font_height - 7),
+            self._local_temp,
+            font=self.small_font,
+            fill=BLACK,
+        )
+
         # Draw the temperature
         (font_width, font_height) = large_font.getsize(self._temperature)
         print("temp font width: " + str(font_width) + "font_height: " + str(font_height))
@@ -186,7 +197,7 @@ class Weather_Graphics:
             font=self.large_font,
             fill=BLACK,
         )
-
+        # Draw the clothes suggections
         (font_width, font_height) = small_font.getsize(self._clothes)
         print("clothes font width: " + str(font_width) + "font_height: " + str(font_height))
         draw.text(

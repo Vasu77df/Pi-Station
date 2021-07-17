@@ -64,7 +64,7 @@ void loop() {
                 humidityLevelChar.writeValue(humidity);
                 Serial.println("Humidity:");
                 Serial.println(humidity); 
-                delay(5000);     
+                delay(1000);     
         }
         digitalWrite(LED_BUILTIN, LOW);
         Serial.print("Disconnected from central: ");

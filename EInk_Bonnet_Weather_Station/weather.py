@@ -11,7 +11,20 @@ import busio
 import board
 from adafruit_epd.ssd1675 import Adafruit_SSD1675
 from weather_graphics import Weather_Graphics
+from bluepy import btle
 
+# function to process the data from BLE local_sensor service data into proper formatting 
+def converter(data):
+    data = str(data)
+    print("Raw data: {}".format(data))
+    data = data.strip('b')
+    data = data.strip("'")
+    data = data.strip('\\r\\n')
+    data = data.strip("x")
+    data = int(data, 16)
+
+    return data
+# Initializing SPI pins for the E ink display
 spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
 ecs = digitalio.DigitalInOut(board.CE0)
 dc = digitalio.DigitalInOut(board.D22)
@@ -20,7 +33,7 @@ busy = digitalio.DigitalInOut(board.D17)
 
 # You'll need to get a token from openweathermap.org, looks like:
 # 'b6907d289e10d714a6e88b30761fae22'
-OPEN_WEATHER_TOKEN = ""
+OPEN_WEATHER_TOKEN = "db42a24208e287f983d4e70ddf1cd4cb"
 
 # Use cityname, country code where countrycode is ISO3166 format.
 # E.g. "New York, US" or "London, GB"
@@ -42,21 +55,33 @@ display = Adafruit_SSD1675(
 )
 
 display.rotation = 1
-
+# Creating an Graphics object that performs our draw function
 gfx = Weather_Graphics(display, am_pm=True, celsius=True)
 weather_refresh = None
 
-#while True:
-    # only query the weather every 10 minutes (and on first run)
-#    if not weather_refresh or (time.monotonic() - weather_refresh) > 600:
+# Performing a URL Pull Request from the weather API
 response = urllib.request.urlopen(data_source)
+
+# Connecting to our BLE local temperature and humidity sensor
+
+print("Connecting....")
+device = btle.Peripheral("E6:3C:45:7D:D5:2C") # peripheral device MAC ADDRESS
+local_sensor = btle.UUID("190f") # The UUID of the entire btle service broadcast
+local_service = device.getServiceByUUID(local_sensor)
+temperature_uuid = btle.UUID("2b19")
+humidity_uuid = btle.UUID("2c19")
+temp_value = local_service.getCharacteristics(temperature_uuid)[0]
+humidity_value = local_service.getCharacteristics(humidity_uuid)[0] # getting sensor data from the BLE characteristics
+temp_int = converter(temp_value.read())
+humidity_int = converter(humidity_value.read())
+# Checking if we get a valid response
 if response.getcode() == 200:
     value = response.read()
     print("Response is", value)
-    gfx.display_weather(value)
+    print(f"The local temperature is: {str(temp_int)}")
+    gfx.display_weather(value, temp_int)
     weather_refresh = time.monotonic()
 else:
-    print("Unable to retrieve data at {}".format(url))
+    print("Unable to retrieve data at {}".format(response))
 
 gfx.update_time()
-#time.sleep(300)  # wait 5 minutes before updating anything again
